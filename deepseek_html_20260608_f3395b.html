@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🍺 Quán Bia - Hệ Thống Quản Lý</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --bg-primary: #0a0c10;
+    --bg-secondary: #14181f;
+    --bg-card: #1e2430;
+    --bg-hover: #2a3240;
+    --accent: #f97316;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --border: #2d3748;
+    --success: #10b981;
+    --danger: #ef4444;
+    --info: #3b82f6;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    background: var(--bg-primary);
+    padding: 4px;
+    border-radius: 40px;
+  }
+
+  .tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 6px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .tab-btn.active {
+    background: var(--accent);
+    color: #0a0c10;
+  }
+
+  .main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .panel-tables { width: 260px; flex-shrink: 0; }
+  .panel-menu { flex: 2; }
+  .panel-invoice { width: 360px; border-right: none; }
+
+  .panel-header {
+    background: var(--bg-secondary);
+    padding: 12px 16px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .icon-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2rem;
+  }
+
+  .icon-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+  }
+
+  .table-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+
+  .table-card.active {
+    border-color: var(--accent);
+    background: #2a2015;
+  }
+
+  .table-name {
+    font-weight: 700;
+  }
+
+  .table-status {
+    font-size: 0.7rem;
+    margin: 6px 0;
+  }
+
+  .status-serving { color: var(--success); }
+
+  .table-total {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .table-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .btn-xs {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    cursor: pointer;
+  }
+
+  .search-box {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .search-box input {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 30px;
+    color: white;
+    outline: none;
+  }
+
+  .cat-scroll {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cat-chip {
+    background: var(--bg-card);
+    padding: 5px 14px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .cat-chip.active {
+    background: var(--accent);
+    color: #0a0c10;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .food-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--border);
+  }
+
+  .food-card:hover {
+    border-color: var(--accent);
+  }
+
+  .food-img {
+    height: 100px;
+    background: #0f1219;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+  }
+
+  .food-info {
+    padding: 10px;
+  }
+
+  .food-name {
+    font-weight: 600;
+  }
+
+  .food-price {
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  .invoice-header {
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .inv-table-name {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .invoice-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+  }
+
+  .cart-item {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 8px;
+  }
+
+  .qty-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .qty-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+  }
+
+  .invoice-footer {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-pay {
+    background: var(--accent);
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 30px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 8px;
+  }
+
+  .btn-split {
+    background: transparent;
+    border: 1px solid var(--info);
+    color: var(--info);
+    width: 100%;
+    padding: 8px;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: var(--bg-secondary);
+    border-radius: 24px;
+    padding: 24px;
+    width: 420px;
+    border: 1px solid var(--border);
+  }
+
+  .modal-content input,
+  .modal-content select {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    margin: 8px 0;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #1e1f2c;
+    border-left: 4px solid var(--accent);
+    padding: 12px 20px;
+    border-radius: 12px;
+    z-index: 1100;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+  }
+
+  .history-panel {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .history-panel.visible {
+    display: flex;
+  }
+
+  .history-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+
+  .history-toolbar {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-secondary);
+  }
+
+  .history-toolbar input {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 8px;
+    border-radius: 8px;
+    color: white;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+  }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin: 0 auto 10px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🍺 QUÁN BIA</div>
+  <div class="tabs">
+    <button class="tab-btn active" id="tabPosBtn">QUẢN LÝ</button>
+    <button class="tab-btn" id="tabHistoryBtn">LỊCH SỬ</button>
+  </div>
+</div>
+
+<div id="posContainer" class="main-layout">
+  <div class="panel panel-tables">
+    <div class="panel-header">
+      🍻 DANH SÁCH BÀN
+      <button class="icon-btn" id="addTableBtn">+</button>
+    </div>
+    <div class="panel-body" id="tablesContainer">
+      <div class="loading"><div class="spinner"></div> Đang tải...</div>
+    </div>
+  </div>
+
+  <div class="panel panel-menu">
+    <div class="panel-header">
+      🍽️ THỰC ĐƠN
+      <button class="icon-btn" id="addMenuItemBtn">+</button>
+    </div>
+    <div class="search-box">
+      <input type="text" id="searchMenuInput" placeholder="Tìm món...">
+    </div>
+    <div class="cat-scroll" id="categoriesList"></div>
+    <div class="panel-body" id="menuContainer">
+      <div class="loading"><div class="spinner"></div> Đang tải...</div>
+    </div>
+  </div>
+
+  <div class="panel panel-invoice">
+    <div id="invoicePanel">
+      <div class="invoice-header" style="text-align: center;">🍺 Chọn bàn để bắt đầu</div>
+    </div>
+  </div>
+</div>
+
+<div id="historyContainer" class="history-panel">
+  <div class="history-toolbar">
+    <input type="text" id="historySearchInput" placeholder="Tìm kiếm...">
+    <input type="date" id="historyDateFilter">
+  </div>
+  <div class="panel-body" id="historyListContainer">
+    <div class="loading"><div class="spinner"></div> Đang tải...</div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div id="addTableModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Thêm bàn mới</h3>
+    <input type="text" id="newTableName" placeholder="Tên bàn">
+    <div class="modal-actions">
+      <button onclick="closeModal('addTableModal')">Hủy</button>
+      <button class="btn-primary" id="confirmAddTableBtn">Thêm</button>
+    </div>
+  </div>
+</div>
+
+<div id="renameTableModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Đổi tên bàn</h3>
+    <input type="text" id="renameTableInput" placeholder="Tên mới">
+    <div class="modal-actions">
+      <button onclick="closeModal('renameTableModal')">Hủy</button>
+      <button class="btn-primary" id="confirmRenameBtn">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<div id="menuItemModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3 id="menuModalTitle">Thêm món</h3>
+    <input type="text" id="menuItemName" placeholder="Tên món">
+    <input type="number" id="menuItemPrice" placeholder="Giá (VNĐ)">
+    <select id="menuItemCat">
+      <option value="Bia">🍺 Bia</option>
+      <option value="Nước ngọt">🥤 Nước ngọt</option>
+      <option value="Món nhậu">🍖 Món nhậu</option>
+      <option value="Lẩu">🍲 Lẩu</option>
+      <option value="Khác">📦 Khác</option>
+    </select>
+    <div class="modal-actions">
+      <button onclick="closeModal('menuItemModal')">Hủy</button>
+      <button class="btn-primary" id="confirmSaveMenuBtn">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== CONFIG - ĐÃ CÓ SẴN GIST ID VÀ TOKEN ==========
+const GIST_ID = '3d248663f1b3bd930db108e34a53e10e';
+const GITHUB_TOKEN = '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';
+
+// ========== STATE ==========
+let tables = [];
+let menu = [];
+let orders = {};
+let historyList = [];
+let selectedTableId = null;
+let currentCategory = "Tất cả";
+let renameTargetId = null;
+const categories = ["Tất cả", "Bia", "Nước ngọt", "Món nhậu", "Lẩu", "Khác"];
+
+// ========== UTILITIES ==========
+function formatMoney(v) {
+  return (v || 0).toLocaleString('vi-VN') + ' đ';
+}
+
+function formatTime(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleString('vi-VN');
+}
+
+function showToast(msg, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  const icon = type === 'success' ? '✅' : type === 'danger' ? '❌' : 'ℹ️';
+  toast.innerHTML = `${icon} ${msg}`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+window.closeModal = function(id) {
+  document.getElementById(id).style.display = 'none';
+};
+
+// ========== GITHUB API ==========
+async function loadFromGitHub() {
+  showToast('Đang tải dữ liệu...', 'info');
+  
+  try {
+    const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+      headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+    });
+    
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    
+    const gist = await res.json();
+    
+    if (gist.files && gist.files['quanbia_data.json']) {
+      const data = JSON.parse(gist.files['quanbia_data.json'].content);
+      tables = data.tables || [];
+      menu = data.menu || [];
+      orders = data.orders || {};
+      historyList = data.history || [];
+      
+      // Thêm dữ liệu mẫu nếu chưa có
+      if (tables.length === 0) {
+        tables.push({ id: '1', name: 'Bàn 1', status: 'empty' });
+        tables.push({ id: '2', name: 'Bàn 2', status: 'empty' });
+        tables.push({ id: '3', name: 'Bàn 3', status: 'empty' });
+      }
+      
+      if (menu.length === 0) {
+        menu.push({ id: 'm1', name: 'Tiger', price: 25000, category: 'Bia' });
+        menu.push({ id: 'm2', name: 'Heineken', price: 30000, category: 'Bia' });
+        menu.push({ id: 'm3', name: 'Coca Cola', price: 15000, category: 'Nước ngọt' });
+        menu.push({ id: 'm4', name: 'Đậu phộng', price: 20000, category: 'Món nhậu' });
+      }
+      
+      renderTables();
+      renderMenu();
+      renderCategories();
+      renderInvoice();
+      
+      showToast(`Đã tải: ${tables.length} bàn, ${menu.length} món`, 'success');
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Lỗi tải dữ liệu, dùng dữ liệu mặc định', 'danger');
+    // Dữ liệu mặc định
+    tables = [
+      { id: '1', name: 'Bàn 1', status: 'empty' },
+      { id: '2', name: 'Bàn 2', status: 'empty' },
+      { id: '3', name: 'Bàn 3', status: 'empty' }
+    ];
+    menu = [
+      { id: 'm1', name: 'Tiger', price: 25000, category: 'Bia' },
+      { id: 'm2', name: 'Heineken', price: 30000, category: 'Bia' },
+      { id: 'm3', name: 'Coca Cola', price: 15000, category: 'Nước ngọt' },
+      { id: 'm4', name: 'Đậu phộng', price: 20000, category: 'Món nhậu' }
+    ];
+    renderTables();
+    renderMenu();
+    renderCategories();
+  }
+}
+
+async function saveToGitHub() {
+  const data = { tables, menu, orders, history: historyList };
+  const content = JSON.stringify(data, null, 2);
+  
+  try {
+    const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        files: { 'quanbia_data.json': { content: content } }
+      })
+    });
+    
+    if (res.ok) {
+      console.log('Saved to GitHub');
+    }
+  } catch (err) {
+    console.error('Save error:', err);
+  }
+}
+
+async function autoSave() {
+  await saveToGitHub();
+}
+
+// ========== RENDER TABLES ==========
+function renderTables() {
+  const container = document.getElementById('tablesContainer');
+  
+  if (!tables.length) {
+    container.innerHTML = '<div class="empty-state">Chưa có bàn, nhấn + để thêm</div>';
+    return;
+  }
+  
+  container.innerHTML = tables.map(table => {
+    const order = orders[table.id];
+    const total = order?.items?.reduce((s, i) => s + i.price * i.qty, 0) || 0;
+    const statusText = table.status === 'serving' ? 'Đang phục vụ' : 'Trống';
+    const isActive = selectedTableId === table.id;
+    
+    return `
+      <div class="table-card ${isActive ? 'active' : ''}" data-id="${table.id}">
+        <div class="table-name">${table.name}</div>
+        <div class="table-status ${table.status === 'serving' ? 'status-serving' : ''}">● ${statusText}</div>
+        ${total > 0 ? `<div class="table-total">${formatMoney(total)}</div>` : ''}
+        <div class="table-actions">
+          <button class="btn-xs rename-btn" data-id="${table.id}">Đổi tên</button>
+          <button class="btn-xs delete-btn" data-id="${table.id}">Xóa</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  // Gắn sự kiện cho các nút
+  document.querySelectorAll('.table-card').forEach(card => {
+    const id = card.dataset.id;
+    card.addEventListener('click', (e) => {
+      if (e.target.classList.contains('rename-btn') || e.target.classList.contains('delete-btn')) return;
+      selectedTableId = id;
+      renderTables();
+      renderInvoice();
+    });
+  });
+  
+  document.querySelectorAll('.rename-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      renameTargetId = btn.dataset.id;
+      const table = tables.find(t => t.id === renameTargetId);
+      document.getElementById('renameTableInput').value = table?.name || '';
+      document.getElementById('renameTableModal').style.display = 'flex';
+    });
+  });
+  
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const table = tables.find(t => t.id === id);
+      if (confirm(`Xóa bàn "${table?.name}"?`)) {
+        tables = tables.filter(t => t.id !== id);
+        delete orders[id];
+        if (selectedTableId === id) selectedTableId = null;
+        renderTables();
+        renderInvoice();
+        await autoSave();
+        showToast(`Đã xóa bàn ${table?.name}`, 'success');
+      }
+    });
+  });
+}
+
+// ========== RENDER INVOICE ==========
+function renderInvoice() {
+  const container = document.getElementById('invoicePanel');
+  
+  if (!selectedTableId || !tables.find(t => t.id === selectedTableId)) {
+    container.innerHTML = '<div class="invoice-header" style="text-align: center;">🍺 Chọn bàn để xem hóa đơn</div>';
+    return;
+  }
+  
+  const table = tables.find(t => t.id === selectedTableId);
+  const order = orders[selectedTableId] || { items: [] };
+  const items = order.items || [];
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  
+  container.innerHTML = `
+    <div class="invoice-header">
+      <div class="inv-table-name">${table.name}</div>
+      <div style="font-size: 12px;">${table.openedAt ? `Mở: ${formatTime(table.openedAt)}` : ''}</div>
+    </div>
+    <div class="invoice-items" id="cartItemsList">
+      ${items.length === 0 ? '<div class="empty-state">Chưa có món</div>' : 
+        items.map((item, idx) => `
+          <div class="cart-item">
+            <div><strong>${item.name}</strong> <span style="float: right;">${formatMoney(item.price * item.qty)}</span></div>
+            <div class="qty-group">
+              <button class="qty-btn" data-idx="${idx}" data-delta="-1">-</button>
+              <span>${item.qty}</span>
+              <button class="qty-btn" data-idx="${idx}" data-delta="1">+</button>
+              <button class="qty-btn" data-remove="${idx}" style="background: var(--danger);">🗑️</button>
+            </div>
+            <input type="text" placeholder="Ghi chú" value="${item.note || ''}" class="note-input" data-idx="${idx}" style="width: 100%; margin-top: 6px; background: #0f1219; border: 1px solid var(--border); border-radius: 8px; padding: 4px; color: white;">
+          </div>
+        `).join('')}
+    </div>
+    <div class="invoice-footer">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+        <span>Tổng:</span>
+        <span style="font-size: 20px; font-weight: 800; color: var(--accent);">${formatMoney(total)}</span>
+      </div>
+      <button class="btn-pay" id="payNowBtn">💵 Thanh toán</button>
+      <button class="btn-split" id="splitItemsBtn">🔄 Chuyển món</button>
+    </div>
+  `;
+  
+  // Gắn sự kiện cho các nút trong invoice
+  document.querySelectorAll('.qty-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const idx = parseInt(btn.dataset.idx);
+      const newItems = [...items];
+      
+      if (btn.dataset.delta) {
+        newItems[idx].qty = Math.max(1, newItems[idx].qty + parseInt(btn.dataset.delta));
+        orders[selectedTableId] = { items: newItems };
+        renderInvoice();
+        await autoSave();
+      } else if (btn.dataset.remove !== undefined) {
+        newItems.splice(idx, 1);
+        if (newItems.length === 0) {
+          delete orders[selectedTableId];
+          const t = tables.find(t => t.id === selectedTableId);
+          if (t) t.status = 'empty';
+        } else {
+          orders[selectedTableId] = { items: newItems };
+        }
+        renderInvoice();
+        renderTables();
+        await autoSave();
+      }
+    });
+  });
+  
+  document.querySelectorAll('.note-input').forEach(inp => {
+    inp.addEventListener('change', async (e) => {
+      const idx = parseInt(inp.dataset.idx);
+      const newItems = [...items];
+      newItems[idx].note = inp.value;
+      orders[selectedTableId] = { items: newItems };
+      await autoSave();
+    });
+  });
+  
+  const payBtn = document.getElementById('payNowBtn');
+  if (payBtn) {
+    payBtn.addEventListener('click', async () => {
+      const given = parseInt(prompt(`Tổng: ${formatMoney(total)}\nTiền khách đưa:`, total));
+      if (!given || given < total) {
+        showToast('Số tiền không hợp lệ', 'danger');
+        return;
+      }
+      
+      historyList.unshift({
+        id: Date.now().toString(),
+        tableId: selectedTableId,
+        tableName: table.name,
+        items: items.map(i => ({ ...i })),
+        total,
+        given,
+        change: given - total,
+        paidAt: new Date().toISOString(),
+        invoiceId: 'HD' + Date.now().toString(36).toUpperCase()
+      });
+      
+      delete orders[selectedTableId];
+      const t = tables.find(t => t.id === selectedTableId);
+      if (t) t.status = 'empty';
+      selectedTableId = null;
+      
+      renderTables();
+      renderInvoice();
+      await autoSave();
+      showToast(`Thanh toán thành công! Thừa: ${formatMoney(given - total)}`, 'success');
+    });
+  }
+  
+  const splitBtn = document.getElementById('splitItemsBtn');
+  if (splitBtn) {
+    splitBtn.addEventListener('click', async () => {
+      if (!items.length) {
+        showToast('Không có món để chuyển', 'danger');
+        return;
+      }
+      
+      const otherTables = tables.filter(t => t.id !== selectedTableId);
+      if (!otherTables.length) {
+        showToast('Không có bàn khác', 'danger');
+        return;
+      }
+      
+      const targetName = prompt(`Chuyển đến bàn nào?\n${otherTables.map(t => t.name).join(', ')}`);
+      const target = otherTables.find(t => t.name === targetName);
+      
+      if (!target) {
+        showToast('Không tìm thấy bàn', 'danger');
+        return;
+      }
+      
+      const itemList = items.map((it, i) => `${i + 1}. ${it.name} (${it.qty})`).join('\n');
+      const itemIdx = parseInt(prompt(`Chọn món:\n${itemList}\nNhập số:`, 1)) - 1;
+      
+      if (isNaN(itemIdx) || itemIdx < 0 || itemIdx >= items.length) {
+        showToast('Số không hợp lệ', 'danger');
+        return;
+      }
+      
+      const qty = parseInt(prompt(`Số lượng (max ${items[itemIdx].qty}):`, items[itemIdx].qty));
+      if (qty < 1 || qty > items[itemIdx].qty) {
+        showToast('Số lượng không hợp lệ', 'danger');
+        return;
+      }
+      
+      const sourceItem = items[itemIdx];
+      const targetOrder = orders[target.id] || { items: [] };
+      let newTargetItems = [...targetOrder.items];
+      const existing = newTargetItems.find(i => i.menuId === sourceItem.menuId);
+      
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        newTargetItems.push({ ...sourceItem, qty });
+      }
+      
+      let newSourceItems = [...items];
+      if (qty === sourceItem.qty) {
+        newSourceItems.splice(itemIdx, 1);
+      } else {
+        newSourceItems[itemIdx] = { ...sourceItem, qty: sourceItem.qty - qty };
+      }
+      
+      orders[selectedTableId] = { items: newSourceItems };
+      orders[target.id] = { items: newTargetItems };
+      
+      if (target.status === 'empty' && newTargetItems.length) {
+        target.status = 'serving';
+      }
+      
+      renderInvoice();
+      renderTables();
+      await autoSave();
+      showToast(`Đã chuyển ${qty} ${sourceItem.name} sang ${target.name}`, 'success');
+    });
+  }
+}
+
+// ========== RENDER MENU ==========
+function renderMenu() {
+  const search = document.getElementById('searchMenuInput')?.value.toLowerCase() || '';
+  let filtered = currentCategory === 'Tất cả' ? menu : menu.filter(m => m.category === currentCategory);
+  if (search) filtered = filtered.filter(m => m.name.toLowerCase().includes(search));
+  
+  const container = document.getElementById('menuContainer');
+  
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty-state">Không có món</div>';
+    return;
+  }
+  
+  container.innerHTML = `<div class="menu-grid">${filtered.map(item => {
+    const icon = item.category === 'Bia' ? '🍺' : item.category === 'Món nhậu' ? '🍖' : '🍽';
+    return `
+      <div class="food-card" data-id="${item.id}">
+        <div class="food-img">${icon}</div>
+        <div class="food-info">
+          <div class="food-name">${item.name}</div>
+          <div class="food-price">${formatMoney(item.price)}</div>
+        </div>
+      </div>
+    `;
+  }).join('')}</div>`;
+  
+  document.querySelectorAll('.food-card').forEach(card => {
+    card.addEventListener('click', async () => {
+      if (!selectedTableId) {
+        showToast('Chọn bàn trước', 'danger');
+        return;
+      }
+      
+      const menuItem = menu.find(m => m.id === card.dataset.id);
+      if (!menuItem) return;
+      
+      const order = orders[selectedTableId] || { items: [] };
+      const items = [...order.items];
+      const ex = items.find(i => i.menuId === menuItem.id);
+      
+      if (ex) {
+        ex.qty++;
+      } else {
+        items.push({
+          menuId: menuItem.id,
+          name: menuItem.name,
+          price: menuItem.price,
+          qty: 1,
+          note: ''
+        });
+      }
+      
+      orders[selectedTableId] = { items };
+      const table = tables.find(t => t.id === selectedTableId);
+      if (table && table.status === 'empty') {
+        table.status = 'serving';
+        table.openedAt = new Date().toISOString();
+      }
+      
+      renderInvoice();
+      renderTables();
+      await autoSave();
+      showToast(`Đã thêm ${menuItem.name}`, 'success');
+    });
+  });
+}
+
+// ========== RENDER CATEGORIES ==========
+function renderCategories() {
+  const container = document.getElementById('categoriesList');
+  container.innerHTML = categories.map(cat => `
+    <div class="cat-chip ${cat === currentCategory ? 'active' : ''}" data-cat="${cat}">
+      ${cat === 'Bia' ? '🍺' : cat === 'Món nhậu' ? '🍖' : cat === 'Nước ngọt' ? '🥤' : cat === 'Lẩu' ? '🍲' : '📋'} ${cat}
+    </div>
+  `).join('');
+  
+  document.querySelectorAll('.cat-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      currentCategory = chip.dataset.cat;
+      renderCategories();
+      renderMenu();
+    });
+  });
+}
+
+// ========== RENDER HISTORY ==========
+function renderHistory() {
+  const search = document.getElementById('historySearchInput')?.value.toLowerCase() || '';
+  const date = document.getElementById('historyDateFilter')?.value || '';
+  
+  let filtered = [...historyList];
+  if (search) {
+    filtered = filtered.filter(h => 
+      (h.tableName || '').toLowerCase().includes(search) || 
+      (h.invoiceId || '').toLowerCase().includes(search)
+    );
+  }
+  if (date) {
+    filtered = filtered.filter(h => h.paidAt?.slice(0, 10) === date);
+  }
+  
+  const container = document.getElementById('historyListContainer');
+  
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty-state">Không có lịch sử</div>';
+    return;
+  }
+  
+  container.innerHTML = filtered.map(h => `
+    <div class="history-card" onclick="alert('Hóa đơn: ${h.invoiceId}\\nBàn: ${h.tableName}\\nTổng: ${formatMoney(h.total)}\\nThời gian: ${formatTime(h.paidAt)}')">
+      <div><strong>${h.invoiceId}</strong> - ${h.tableName}</div>
+      <div style="color: var(--accent);">${formatMoney(h.total)}</div>
+      <div style="font-size: 11px;">${formatTime(h.paidAt)}</div>
+    </div>
+  `).join('');
+}
+
+// ========== EVENT HANDLERS ==========
+// Nút thêm bàn
+document.getElementById('addTableBtn').addEventListener('click', () => {
+  document.getElementById('addTableModal').style.display = 'flex';
+  document.getElementById('newTableName').value = '';
+});
+
+document.getElementById('confirmAddTableBtn').addEventListener('click', async () => {
+  const name = document.getElementById('newTableName').value.trim();
+  if (!name) {
+    showToast('Nhập tên bàn', 'danger');
+    return;
+  }
+  
+  const newId = Date.now().toString();
+  tables.push({ id: newId, name, status: 'empty', createdAt: new Date().toISOString() });
+  renderTables();
+  await autoSave();
+  closeModal('addTableModal');
+  showToast(`Đã thêm bàn ${name}`, 'success');
+});
+
+// Nút thêm món
+document.getElementById('addMenuItemBtn').addEventListener('click', () => {
+  document.getElementById('menuModalTitle').innerText = 'Thêm món';
+  document.getElementById('menuItemName').value = '';
+  document.getElementById('menuItemPrice').value = '';
+  document.getElementById('menuItemCat').value = 'Bia';
+  document.getElementById('menuItemModal').style.display = 'flex';
+});
+
+document.getElementById('confirmSaveMenuBtn').addEventListener('click', async () => {
+  const name = document.getElementById('menuItemName').value.trim();
+  const price = parseInt(document.getElementById('menuItemPrice').value);
+  const category = document.getElementById('menuItemCat').value;
+  
+  if (!name) {
+    showToast('Nhập tên món', 'danger');
+    return;
+  }
+  if (!price || price <= 0) {
+    showToast('Nhập giá hợp lệ', 'danger');
+    return;
+  }
+  
+  menu.push({
+    id: Date.now().toString(),
+    name,
+    price,
+    category,
+    createdAt: new Date().toISOString()
+  });
+  
+  renderMenu();
+  await autoSave();
+  closeModal('menuItemModal');
+  showToast(`Đã thêm ${name}`, 'success');
+});
+
+// Nút đổi tên
+document.getElementById('confirmRenameBtn').addEventListener('click', async () => {
+  const newName = document.getElementById('renameTableInput').value.trim();
+  if (!newName) {
+    showToast('Nhập tên mới', 'danger');
+    return;
+  }
+  
+  const table = tables.find(t => t.id === renameTargetId);
+  if (table) {
+    table.name = newName;
+    renderTables();
+    if (selectedTableId === renameTargetId) renderInvoice();
+    await autoSave();
+    showToast(`Đã đổi tên thành ${newName}`, 'success');
+  }
+  
+  closeModal('renameTableModal');
+});
+
+// Tab switching
+document.getElementById('tabPosBtn').addEventListener('click', () => {
+  document.getElementById('tabPosBtn').classList.add('active');
+  document.getElementById('tabHistoryBtn').classList.remove('active');
+  document.getElementById('posContainer').style.display = 'flex';
+  document.getElementById('historyContainer').classList.remove('visible');
+});
+
+document.getElementById('tabHistoryBtn').addEventListener('click', () => {
+  document.getElementById('tabHistoryBtn').classList.add('active');
+  document.getElementById('tabPosBtn').classList.remove('active');
+  document.getElementById('posContainer').style.display = 'none';
+  document.getElementById('historyContainer').classList.add('visible');
+  renderHistory();
+});
+
+// Search
+document.getElementById('searchMenuInput').addEventListener('input', () => renderMenu());
+document.getElementById('historySearchInput').addEventListener('input', () => renderHistory());
+document.getElementById('historyDateFilter').addEventListener('change', () => renderHistory());
+
+// Khởi động
+loadFromGitHub();
+</script>
+</body>
+</html>
